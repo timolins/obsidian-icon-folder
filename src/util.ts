@@ -465,15 +465,16 @@ export const insertIconToNode = (plugin: IconFolderPlugin, icon: string, node: H
     }
     node.innerHTML = iconContent;
   } else {
-    const emoji = twemoji.parse(icon, {
-      folder: 'svg',
-      ext: '.svg',
-      attributes: () => ({
-        width: '16px',
-        height: '16px',
-      }),
-    }) as any;
-    node.innerHTML = customizeIconStyle(plugin, emoji, node);
+    // const emoji = twemoji.parse(icon, {
+    //   folder: 'svg',
+    //   ext: '.svg',
+    //   attributes: () => ({
+    //     width: '16px',
+    //     height: '16px',
+    //   }),
+    // }) as any;
+    node.innerHTML = `<span style="width: 16px;height:16px;font-size:16px;line-height:1;padding: 0 2px;">${icon}</span>`;
+    // node.innerHTML = customizeIconStyle(plugin, emoji, node);
   }
 };
 
