@@ -1,4 +1,4 @@
-import { Plugin, MenuItem, TFile } from 'obsidian';
+import { Plugin, MenuItem, TFile, parseFrontMatterEntry, TAbstractFile } from 'obsidian';
 import { ExplorerView } from './@types/obsidian';
 import { createDefaultDirectory, initIconPacks, listPath, loadIcon, loadUsedIcons, setPath } from './iconPackManager';
 import IconsPickerModal, { Icon } from './iconsPickerModal';
@@ -13,6 +13,7 @@ import {
   getIconsInData,
   addCustomRuleIconsToDOM,
   doesCustomRuleIconExists,
+  addToDOM,
 } from './util';
 import { migrateIcons } from './migration';
 import IconFolderSettingsTab from './settingsTab';
@@ -121,6 +122,21 @@ export default class IconFolderPlugin extends Plugin {
         this.renameFolder(file.path, oldPath);
       }),
     );
+
+    const updateEmoji = (file: TAbstractFile) => {
+      if (!(file instanceof TFile)) {
+        return;
+      }
+
+      const fm = this.app.metadataCache.getFileCache(file)?.frontmatter;
+      const emoji = parseFrontMatterEntry(fm, 'icon') || parseFrontMatterEntry(fm, 'emoji');
+
+      if (emoji) {
+        addToDOM(this, file.path, emoji);
+        this.addFolderIcon(file.path, emoji);
+      }
+    };
+    this.registerEvent(this.app.vault.on('modify', updateEmoji));
 
     this.addSettingTab(new IconFolderSettingsTab(this.app, this));
   }
